@@ -1,13 +1,11 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 @Data
 @Builder(setterPrefix = "with")
-@RequiredArgsConstructor
-public class User {
+public class UserDto {
    private int id;
    private String name;
    private String email;
