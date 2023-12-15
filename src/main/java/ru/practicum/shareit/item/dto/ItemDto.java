@@ -10,7 +10,7 @@ import ru.practicum.shareit.user.User;
 public class ItemDto {
    private Integer id;
    private User owner;
-   private String title;
+   private String name;
    private String description;
    private Boolean available;
    private ItemRequest request;

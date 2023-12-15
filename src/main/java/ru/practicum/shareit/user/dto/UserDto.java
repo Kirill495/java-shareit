@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder(setterPrefix = "with")
 public class UserDto {
-   private int id;
+   private Integer id;
    private String name;
    private String email;
 }
