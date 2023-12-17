@@ -64,13 +64,18 @@ public class ItemDaoInMemoryImpl implements ItemDao {
 
   @Override
   public List<Item> searchForItems(String text) {
-    List<Item> result = new ArrayList<>();
-    for (Map<Integer, Item> itemsSet : allItems.values()) {
-      result.addAll(itemsSet.values().stream()
-              .filter(item -> ((item.getTitle().toUpperCase().contains(text.toUpperCase()) && item.getAvailable())
-                            || (item.getDescription().toUpperCase().contains(text.toUpperCase()) && item.getAvailable())))
-              .collect(Collectors.toList()));
-    }
+    List<Item> result = allItems.values().stream()
+            .flatMap(itemWithId -> itemWithId.values().stream())
+            .filter(item -> (checkItem(item, text)))
+            .collect(Collectors.toList());
     return result;
+  }
+
+  private static boolean checkItem(Item item, String text) {
+    String name = item.getName().toUpperCase();
+    String description = item.getDescription().toUpperCase();
+    String preparedText = text.toUpperCase();
+
+    return (item.getAvailable() && (name.contains(preparedText) || description.contains(preparedText)));
   }
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dao.UserDao;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.validation.CreateNewUserInfo;
 import ru.practicum.shareit.user.validation.UpdateUserInfo;
 
@@ -29,14 +30,14 @@ public class UserService {
    }
 
    public UserDto createNewUser(UserDto userDto) {
+      validateUserInput(userDto, CreateNewUserInfo.class);
       User user = UserMapper.toUser(userDto);
-      validateUserInput(user, CreateNewUserInfo.class);
       return UserMapper.toUserDto(repository.addNewUser(user));
    }
 
    public UserDto updateUser(int userId, UserDto userDto) {
+      validateUserInput(userDto, UpdateUserInfo.class);
       User user = UserMapper.toUser(userDto);
-      validateUserInput(user, UpdateUserInfo.class);
       return UserMapper.toUserDto(repository.updateUser(userId, user));
    }
 
@@ -44,12 +45,12 @@ public class UserService {
       repository.removeUser(userId);
    }
 
-   private <T> void validateUserInput(User user, Class<T> className) {
+   private <T> void validateUserInput(UserDto userDto, Class<T> className) {
       Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-      Set<ConstraintViolation<User>> violations = validator.validate(user, className);
+      Set<ConstraintViolation<UserDto>> violations = validator.validate(userDto, className);
       if (!violations.isEmpty()) {
          StringBuilder sb = new StringBuilder();
-         for (ConstraintViolation<User> violation : violations) {
+         for (ConstraintViolation<UserDto> violation : violations) {
             sb.append(violation.getPropertyPath());
             sb.append(": ");
             sb.append(violation.getMessage());

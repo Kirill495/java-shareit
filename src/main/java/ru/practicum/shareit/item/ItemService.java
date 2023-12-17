@@ -7,10 +7,13 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.validation.CreateNewItemInfo;
 import ru.practicum.shareit.item.validation.UpdateItemInfo;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.dao.UserDao;
 
-import javax.validation.*;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -27,23 +30,23 @@ public class ItemService {
 
     User user = userRepository.getUser(userId);
 
+    validateItemInput(itemDto, CreateNewItemInfo.class);
     Item item = ItemMapper.toItem(itemDto, user);
-    validateItemInput(item, CreateNewItemInfo.class);
+
     return ItemMapper.toItemDto(itemRepository.addNewItem(userId, item));
   }
 
   public ItemDto updateItem(int userId, int itemId, ItemDto itemDto) {
     userRepository.getUser(userId);
+    validateItemInput(itemDto, UpdateItemInfo.class);
     Item item = itemRepository.getUserItem(userId, itemId);
-
     Item newItem = ItemMapper.toItem(itemDto);
-    validateItemInput(newItem, UpdateItemInfo.class);
 
     if (newItem.getAvailable() != null) {
       item.setAvailable(newItem.getAvailable());
     }
-    if (newItem.getTitle() != null) {
-      item.setTitle(newItem.getTitle());
+    if (newItem.getName() != null) {
+      item.setName(newItem.getName());
     }
     if (newItem.getDescription() != null) {
       item.setDescription(newItem.getDescription());
@@ -74,12 +77,12 @@ public class ItemService {
             .collect(Collectors.toList());
   }
 
-  private <T> void validateItemInput(Item item, Class<T> className) {
+  private <T> void validateItemInput(ItemDto itemDto, Class<T> className) {
     Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-    Set<ConstraintViolation<Item>> violations = validator.validate(item, className);
+    Set<ConstraintViolation<ItemDto>> violations = validator.validate(itemDto, className);
     if (!violations.isEmpty()) {
       StringBuilder sb = new StringBuilder();
-      for (ConstraintViolation<Item> violation : violations) {
+      for (ConstraintViolation<ItemDto> violation : violations) {
         sb.append(violation.getPropertyPath());
         sb.append(": ");
         sb.append(violation.getMessage());
