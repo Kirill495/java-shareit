@@ -34,27 +34,26 @@ public class ItemService {
 
   public ItemDto updateItem(int userId, int itemId, ItemDto itemDto) {
     userRepository.getUser(userId);
-    Item existingItem = itemRepository.getItem(userId, itemId);
+    Item item = itemRepository.getUserItem(userId, itemId);
 
     Item newItem = ItemMapper.toItem(itemDto);
     validateItemInput(newItem, UpdateItemInfo.class);
 
     if (newItem.getAvailable() != null) {
-      existingItem.setAvailable(newItem.getAvailable());
+      item.setAvailable(newItem.getAvailable());
     }
     if (newItem.getTitle() != null) {
-      existingItem.setTitle(newItem.getTitle());
+      item.setTitle(newItem.getTitle());
     }
     if (newItem.getDescription() != null) {
-      existingItem.setDescription(newItem.getDescription());
+      item.setDescription(newItem.getDescription());
     }
-
-    return ItemMapper.toItemDto(existingItem);
+    return ItemMapper.toItemDto(itemRepository.updateItem(userId, item));
   }
 
-  public ItemDto getUserItem(int userId, int itemId) {
+  public ItemDto getItem(int userId, int itemId) {
     userRepository.getUser(userId);
-    return ItemMapper.toItemDto(itemRepository.getItem(userId, itemId));
+    return ItemMapper.toItemDto(itemRepository.getItem(itemId));
   }
 
   public List<ItemDto> getUserItems(int userId) {
@@ -69,7 +68,6 @@ public class ItemService {
     if (text.isBlank()) {
       return Collections.emptyList();
     }
-
     return itemRepository
             .searchForItems(text).stream()
             .map(ItemMapper::toItemDto)

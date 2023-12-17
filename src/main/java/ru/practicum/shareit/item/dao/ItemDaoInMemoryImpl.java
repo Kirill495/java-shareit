@@ -18,7 +18,14 @@ public class ItemDaoInMemoryImpl implements ItemDao {
   private static Integer currentItemId = 0;
 
   @Override
-  public Item getItem(int userId, int itemId) {
+  public Item getItem(int itemId) {
+    return allItems.values().stream()
+            .map(itemsWithId -> itemsWithId.get(itemId))
+            .findAny().orElse(null);
+  }
+
+  @Override
+  public Item getUserItem(int userId, int itemId) {
     if (!allItems.containsKey(userId)) {
       throw new UserItemNotFoundException(String.format("Предметы пользователя %d не найдены", userId));
     }
@@ -38,15 +45,15 @@ public class ItemDaoInMemoryImpl implements ItemDao {
 
   @Override
   public Item addNewItem(int userId, Item item) {
-
     item.setId(++currentItemId);
     if (!allItems.containsKey(userId)) {
-      allItems.put(userId, Map.of(item.getId(), item));
+      Map<Integer, Item> items = new HashMap<>();
+      items.put(item.getId(), item);
+      allItems.put(userId, items);
     } else {
       allItems.get(userId).put(item.getId(), item);
     }
     return item;
-
   }
 
   @Override

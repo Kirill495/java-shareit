@@ -6,9 +6,11 @@ import java.util.List;
 
 public interface ItemDao {
 
-  Item getItem(int userId, int itemId);
+  Item getItem(int itemId);
 
   List<Item> getUserItems(int userId);
+
+  Item getUserItem(int userId, int itemId);
 
   Item addNewItem(int userId, Item item);
 
