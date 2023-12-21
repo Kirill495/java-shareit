@@ -56,7 +56,11 @@ public class ItemService {
 
   public ItemDto getItem(int userId, int itemId) {
     userRepository.getUser(userId);
-    return ItemMapper.toItemDto(itemRepository.getItem(itemId));
+    Item item = itemRepository.getItem(itemId);
+    if (item == null) {
+      return null;
+    }
+    return ItemMapper.toItemDto(item);
   }
 
   public List<ItemDto> getUserItems(int userId) {
@@ -71,8 +75,13 @@ public class ItemService {
     if (text.isBlank()) {
       return Collections.emptyList();
     }
-    return itemRepository
-            .searchForItems(text).stream()
+    List<Item> resultItems = itemRepository
+            .searchForItems(text);
+    if (resultItems.isEmpty()) {
+      return Collections.emptyList();
+    }
+    return resultItems
+            .stream()
             .map(ItemMapper::toItemDto)
             .collect(Collectors.toList());
   }

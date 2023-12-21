@@ -13,8 +13,8 @@ import java.util.Map;
 @Repository
 public class UserDaoInMemoryImpl implements UserDao {
 
-   private static Map<Integer, User> allUsers = new HashMap<>();
-   private static Integer currentUserId = 0;
+   private Map<Integer, User> allUsers = new HashMap<>();
+   private Integer currentUserId = 0;
 
    @Override
    public List<User> getAllUsers() {

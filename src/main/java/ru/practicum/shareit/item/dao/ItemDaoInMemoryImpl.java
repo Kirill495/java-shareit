@@ -14,14 +14,18 @@ import java.util.stream.Collectors;
 @Repository
 public class ItemDaoInMemoryImpl implements ItemDao {
 
-  private static Map<Integer, Map<Integer, Item>> allItems = new HashMap<>();
-  private static Integer currentItemId = 0;
+  private Map<Integer, Map<Integer, Item>> allItems = new HashMap<>();
+  private Integer currentItemId = 0;
 
   @Override
   public Item getItem(int itemId) {
+    if (allItems.isEmpty()) {
+      return null;
+    }
     return allItems.values().stream()
-            .map(itemsWithId -> itemsWithId.get(itemId))
-            .findAny().orElse(null);
+            .map(itemsWithId -> itemsWithId.getOrDefault(itemId, null))
+            .filter(item -> (item != null))
+            .findFirst().orElse(null);
   }
 
   @Override
