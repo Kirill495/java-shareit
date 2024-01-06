@@ -1,26 +1,28 @@
 package ru.practicum.shareit.item.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.item.validation.CreateNewItemInfo;
+import lombok.NoArgsConstructor;
+import ru.practicum.shareit.booking.dto.LightBookingDTO;
+import ru.practicum.shareit.comment.Dto.OutputCommentDto;
 import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.LightUserDto;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder(setterPrefix = "with")
 public class ItemDto {
    private Integer id;
-   private User owner;
-   @NotNull(groups = CreateNewItemInfo.class)
-   @NotBlank(groups = CreateNewItemInfo.class)
+   private LightUserDto owner;
    private String name;
-   @NotNull(groups = CreateNewItemInfo.class)
-   @NotBlank(groups = CreateNewItemInfo.class)
    private String description;
-   @NotNull(groups = CreateNewItemInfo.class)
    private Boolean available;
+   private LightBookingDTO lastBooking;
+   private LightBookingDTO nextBooking;
    private ItemRequest request;
+   private List<OutputCommentDto> comments;
 }

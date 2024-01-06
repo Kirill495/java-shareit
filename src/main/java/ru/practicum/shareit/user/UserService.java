@@ -1,9 +1,13 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.dao.UserDao;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.exceptions.UserDuplicateEmailException;
+import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.validation.CreateNewUserInfo;
 import ru.practicum.shareit.user.validation.UpdateUserInfo;
@@ -19,30 +23,62 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-   private final UserDao repository;
+
+//   private final UserDao repository;
+   @Autowired
+   private final UserRepository userRepository;
 
    public List<UserDto> getAllUsers() {
-      return repository.getAllUsers().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
+      return userRepository.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
+//      return repository.getAllUsers().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
    }
 
    public UserDto getUser(int userId) {
-      return UserMapper.toUserDto(repository.getUser(userId));
+      return UserMapper.toUserDto(userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId)));
    }
 
    public UserDto createNewUser(UserDto userDto) {
       validateUserInput(userDto, CreateNewUserInfo.class);
       User user = UserMapper.toUser(userDto);
-      return UserMapper.toUserDto(repository.addNewUser(user));
+
+      User savedUser = null;
+      try {
+         savedUser = userRepository.save(user);
+      } catch (DataIntegrityViolationException exception) {
+         if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserDuplicateEmailException(user);
+         }
+      }
+      return UserMapper.toUserDto(savedUser);
    }
 
    public UserDto updateUser(int userId, UserDto userDto) {
+
       validateUserInput(userDto, UpdateUserInfo.class);
-      User user = UserMapper.toUser(userDto);
-      return UserMapper.toUserDto(repository.updateUser(userId, user));
+      User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+      if (userDto.getName() != null) {
+         user.setName(userDto.getName());
+      }
+      if (userDto.getEmail() != null) {
+         user.setEmail(userDto.getEmail());
+      }
+      User updatedUser = null;
+      try {
+         updatedUser = userRepository.save(user);
+      } catch (DataIntegrityViolationException exception) {
+         if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserDuplicateEmailException(user);
+         }
+      }
+      return UserMapper.toUserDto(updatedUser);
    }
 
    public void removeUser(int userId) {
-      repository.removeUser(userId);
+      try {
+         userRepository.deleteById(userId);
+      } catch (EmptyResultDataAccessException e) {
+         throw new UserNotFoundException(userId);
+      }
    }
 
    private <T> void validateUserInput(UserDto userDto, Class<T> className) {

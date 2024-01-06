@@ -34,8 +34,7 @@ public class UserDaoInMemoryImpl implements UserDao {
 
       if (allUsers.values().stream()
               .anyMatch(currentUser -> (currentUser.getEmail().equals(user.getEmail())))) {
-         throw new UserDuplicateEmailException(
-                 String.format("Пользователь с email \"%s\" уже существует", user.getEmail()));
+         throw new UserDuplicateEmailException(user);
       }
       user.setId(++currentUserId);
       allUsers.put(user.getId(), user);
@@ -50,8 +49,7 @@ public class UserDaoInMemoryImpl implements UserDao {
       }
       if (allUsers.values().stream()
               .anyMatch(currentUser -> (currentUser.getEmail().equals(user.getEmail()) && currentUser.getId() != userId))) {
-         throw new UserDuplicateEmailException(
-                 String.format("Пользователь с email \"%s\" уже существует", user.getEmail()));
+         throw new UserDuplicateEmailException(user);
       }
       User savedUser = allUsers.get(userId);
       if (user.getEmail() != null) {
