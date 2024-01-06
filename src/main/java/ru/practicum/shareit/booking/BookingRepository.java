@@ -24,13 +24,6 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
           "ORDER BY b.start DESC")
   Booking getUserRelatedBookingById(User user, int bookingId);
 
-  @Query("SELECT b " +
-          "FROM Booking b " +
-          "JOIN FETCH b.item AS i " +
-          "WHERE b.id = ?2 " +
-          "AND (i.owner = ?1)")
-  Booking getByItemOwnerAndId(User user, int bookingId);
-
   @Query("SELECT DISTINCT b " +
           "FROM Booking AS b " +
           "JOIN FETCH b.item AS i " +
@@ -41,19 +34,11 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
   @Query(value = "SELECT DISTINCT b " +
           "FROM Booking AS b " +
           "JOIN FETCH b.booker AS u " +
-          "WHERE b.item = ?1 AND b.end < CURRENT_TIMESTAMP " +
+          "WHERE b.item = ?1 AND b.start < CURRENT_TIMESTAMP " +
+          "   AND b.status != 'REJECTED' " +
           "ORDER BY b.start DESC")
   Booking getLastBooking(Item item, PageRequest page);
 
-//  @Query(value =
-//          "SELECT items.id as itemId, bookings.id as bookingId, bookings.booker_id as bookerId " +
-//                  "FROM items AS items " +
-//                  " JOIN bookings AS bookings " +
-//                  " ON items.id = bookings.item_id " +
-////            "   AND bookings.end_date < CURRENT_TIMESTAMP " +
-//                  "WHERE items.id IN (:item_ids) order by item_id",
-//          nativeQuery = true)
-//
   @Query(value = "SELECT subquery.item_id AS itemId, bookings.id AS bookingId, bookings.booker_id AS bookerId " +
           "FROM " +
           "(SELECT items.id as item_id, MAX(bookings.end_date) as end_date " +
@@ -88,6 +73,7 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
           "FROM Booking AS b " +
           "JOIN FETCH b.booker AS u " +
           "WHERE b.item = ?1 AND b.start > CURRENT_TIMESTAMP " +
+          "   AND b.status != 'REJECTED' " +
           "ORDER BY b.start")
   Booking getNextBooking(Item item, PageRequest page);
 

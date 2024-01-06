@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingMapper;
@@ -26,7 +25,6 @@ import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +38,6 @@ public class ItemService {
   private final ItemRepository itemRepository;
   private final BookingRepository bookingRepository;
   private final CommentRepository commentRepository;
-  private final Environment environment;
 
   public ItemDto createNewItem(int userId, InputNewItemDTO itemDto) {
     Item item = ItemMapper.toItem(itemDto);
@@ -78,7 +75,6 @@ public class ItemService {
     Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(itemId));
     ItemDto itemDto = ItemMapper.toItemDto(item);
 
-    boolean testMode = Arrays.asList(environment.getActiveProfiles()).contains("test");
     if (item.getOwner().equals(currentUser)) {
       PageRequest page = PageRequest.of(0, 1);
       Booking lastBooking = bookingRepository.getLastBooking(item, page);
@@ -86,15 +82,6 @@ public class ItemService {
       Booking nextBooking = bookingRepository.getNextBooking(item, page);
       itemDto.setNextBooking(BookingMapper.toLightBookingDTO(nextBooking));
     }
-//    if (testMode) {
-      if (userId == 1 && itemId == 1) { // Вставка, чтобы прошел тест "Item 1 get from user 1 (owner) without comments"
-        itemDto.setLastBooking(null);
-        itemDto.setNextBooking(null);
-      } else if (userId == 4 && itemId == 6 && itemDto.getLastBooking() == null) { // Еще одна вставка, чтобы прошел тест "Item 6 get  by user 4 (owner) without comments"
-        itemDto.setLastBooking(new LightBookingDTO(8, 1));
-      }
-//    }
-
     List<Comment> comments = commentRepository.findByItemOrderById(item);
     if (!comments.isEmpty()) {
       itemDto.setComments(comments.stream().map(CommentMapper::toCommentDto).collect(Collectors.toList()));
