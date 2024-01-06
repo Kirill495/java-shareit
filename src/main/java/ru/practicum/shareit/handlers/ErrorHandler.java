@@ -11,7 +11,7 @@ import ru.practicum.shareit.booking.exceptions.CreateBookingByOwnerException;
 import ru.practicum.shareit.booking.exceptions.CreateBookingForUnavailableItemException;
 import ru.practicum.shareit.booking.exceptions.UnknownBookingStateException;
 import ru.practicum.shareit.booking.exceptions.UserIsNotOwnerOfBookedItem;
-import ru.practicum.shareit.item.NoBookingsToItemException;
+import ru.practicum.shareit.booking.exceptions.NoBookingsToItemException;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.user.exceptions.UserDuplicateEmailException;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
