@@ -8,7 +8,6 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.dto.LightItemDto;
 import ru.practicum.shareit.user.UserMapper;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +18,8 @@ public class BookingMapper {
     }
     return BookingDto.builder()
             .withId(booking.getId())
-            .withStart(booking.getStart().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-            .withEnd(booking.getEnd().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+            .withStart(booking.getStart())
+            .withEnd(booking.getEnd())
             .withStatus(booking.getStatus())
             .withBooker(UserMapper.toLightUserDto(booking.getBooker()))
             .withItem(LightItemDto.toLightItem(booking.getItem()))
