@@ -13,6 +13,8 @@ import ru.practicum.shareit.booking.exceptions.UnknownBookingStateException;
 import ru.practicum.shareit.booking.exceptions.UserIsNotOwnerOfBookedItem;
 import ru.practicum.shareit.booking.exceptions.NoBookingsToItemException;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
+import ru.practicum.shareit.user.exceptions.CreateNewUserException;
+import ru.practicum.shareit.user.exceptions.UpdateUserException;
 import ru.practicum.shareit.user.exceptions.UserDuplicateEmailException;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 
@@ -105,7 +107,6 @@ public class ErrorHandler {
       return Map.of("error", exception.getMessage());
    }
 
-
    @ExceptionHandler(NoBookingsToItemException.class)
    @ResponseStatus(HttpStatus.BAD_REQUEST)
    public Map<String, String> handleNoBookingsToItemException(
@@ -114,4 +115,27 @@ public class ErrorHandler {
       return Map.of("error", exception.getMessage());
    }
 
+   @ExceptionHandler(CreateNewUserException.class)
+   @ResponseStatus(HttpStatus.BAD_REQUEST)
+   public Map<String, String> handleCreateNewUserException(
+           final CreateNewUserException exception) {
+      log.debug("Получен статус {}", HttpStatus.BAD_REQUEST, exception);
+      return Map.of("error", exception.getMessage());
+   }
+
+   @ExceptionHandler(UpdateUserException.class)
+   @ResponseStatus(HttpStatus.BAD_REQUEST)
+   public Map<String, String> handleUpdateUserException(
+           final UpdateUserException exception) {
+      log.debug("Получен статус {}", HttpStatus.BAD_REQUEST, exception);
+      return Map.of("error", exception.getMessage());
+   }
+
+   @ExceptionHandler(RuntimeException.class)
+   @ResponseStatus(HttpStatus.BAD_REQUEST)
+   public Map<String, String> handleRuntimeException(
+           final RuntimeException exception) {
+      log.debug("Получен статус {}", HttpStatus.BAD_REQUEST, exception);
+      return Map.of("error", exception.getMessage());
+   }
 }
