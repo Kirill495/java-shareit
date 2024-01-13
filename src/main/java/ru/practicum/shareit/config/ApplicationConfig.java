@@ -33,7 +33,6 @@ class ApplicationConfig {
     Properties properties = new Properties();
     properties.put("hibernate.dialect", environment.getRequiredProperty("spring.jpa.properties.hibernate.dialect"));
     properties.put("hibernate.show_sql", environment.getProperty("spring.jpa.properties.hibernate.show_sql"));
-//    properties.put("java")
     return properties;
   }
 

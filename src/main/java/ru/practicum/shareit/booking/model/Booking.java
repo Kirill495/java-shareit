@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 
@@ -15,31 +14,13 @@ import java.time.LocalDateTime;
 @Builder(setterPrefix = "with")
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "bookings")
 public class Booking {
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
+
    private Integer id;
-
-   @ManyToOne(fetch = FetchType.LAZY, targetEntity = User.class)
-   @JoinColumn(name = "booker_id")
    private User booker;
-
-   @ManyToOne(fetch = FetchType.LAZY, targetEntity = Item.class)
-   @JoinColumn(name = "item_id")
    private Item item;
-
-   @Column(name = "start_date")
    private LocalDateTime start;
-
-   @Column(name = "end_date")
    private LocalDateTime end;
-
-   @Column(name = "status")
-   @Enumerated(EnumType.STRING)
    private BookingStatus status;
-
-   @Transient
    private String review;
 }

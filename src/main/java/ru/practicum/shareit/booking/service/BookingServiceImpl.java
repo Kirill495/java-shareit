@@ -1,62 +1,69 @@
 package ru.practicum.shareit.booking.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.BookingMapper;
-import ru.practicum.shareit.booking.BookingRepository;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.InputBooking;
+import ru.practicum.shareit.booking.entity.BookingEntity;
 import ru.practicum.shareit.booking.exceptions.BookingNotFoundException;
 import ru.practicum.shareit.booking.exceptions.BookingSetStatusByOwnerException;
 import ru.practicum.shareit.booking.exceptions.CreateBookingByOwnerException;
 import ru.practicum.shareit.booking.exceptions.CreateBookingForUnavailableItemException;
 import ru.practicum.shareit.booking.exceptions.UnknownBookingStateException;
 import ru.practicum.shareit.booking.exceptions.UserIsNotOwnerOfBookedItem;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.item.ItemRepository;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.entity.UserEntity;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
-  @Autowired
-  UserRepository userRepository;
-  @Autowired
-  ItemRepository itemRepository;
-  @Autowired
-  BookingRepository bookingRepository;
+  private final UserRepository userRepository;
+  private final ItemRepository itemRepository;
+  private final BookingRepository bookingRepository;
+  private final UserMapper userMapper;
+  private final BookingMapper bookingMapper;
+  private final ItemMapper itemMapper;
 
   @Override
-  public BookingDto addBooking(int userId, InputBooking inputBooking) {
+  public Booking addBooking(int userId, int itemId, Booking inputBooking) {
 
-    User booker = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-    int itemId = inputBooking.getItemId();
-    Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(itemId));
+    User booker = userMapper
+            .toModel(userRepository
+                    .findById(userId).orElseThrow(() -> new UserNotFoundException(userId)));
+    inputBooking.setBooker(booker);
+    Item item = itemMapper
+            .toModel(itemRepository
+                    .findById(itemId).orElseThrow(() -> new ItemNotFoundException(itemId)));
     if (!item.getAvailable()) {
       throw new CreateBookingForUnavailableItemException(item);
     } else if (item.getOwner().equals((booker))) {
       throw new CreateBookingByOwnerException(item.getId(), userId);
     }
-    Booking booking = BookingMapper.toBooking(inputBooking);
-    booking.setBooker(booker);
-    booking.setItem(item);
-    Booking savedBooking = bookingRepository.save(booking);
-
-    return BookingMapper.toBookingDto(savedBooking);
+    inputBooking.setBooker(booker);
+    inputBooking.setItem(item);
+    return bookingMapper
+              .toModel(bookingRepository
+                      .save(bookingMapper
+                              .toEntity(inputBooking)));
   }
 
   @Override
-  public BookingDto updateApprovedStatus(int userId, int bookingId, boolean approved) {
-    User owner = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-    Booking booking = bookingRepository.getBookingWithAllPropertiesById(bookingId);
+  public Booking updateApprovedStatus(int userId, int bookingId, boolean approved) {
+    User owner = userMapper.toModel(userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId)));
+    Booking booking = bookingMapper.toModel(bookingRepository.getBookingWithAllPropertiesById(bookingId));
     if (booking == null) {
       throw new BookingNotFoundException(bookingId);
     }
@@ -73,23 +80,24 @@ public class BookingServiceImpl implements BookingService {
       throw new BookingSetStatusByOwnerException(String.format("Не удалось обновить статус бронирования. " +
               "Исходный статус бронирования: %s, а должен быть WAITING", booking.getStatus().toString()));
     }
-    return BookingMapper.toBookingDto(bookingRepository.save(booking));
+    return bookingMapper.toModel(bookingRepository.save(bookingMapper.toEntity(booking)));
   }
 
   @Override
-  public BookingDto getBooking(int userId, int bookingId) {
-    User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-    Booking booking = bookingRepository.getUserRelatedBookingById(user, bookingId);
+  public Booking getBooking(int userId, int bookingId) {
+    User user = userMapper.toModel(userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId)));
+    Booking booking = bookingMapper.toModel(bookingRepository.getUserRelatedBookingById(
+            userMapper.toEntity(user), bookingId));
     if (booking == null) {
       throw new BookingNotFoundException(bookingId);
     }
-    return BookingMapper.toBookingDto(booking);
+    return booking;
   }
 
   @Override
-  public List<BookingDto> getBookingsOfItemOwner(int userId, String state) {
-    User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-    List<Booking> bookings;
+  public List<Booking> getBookingsOfItemOwner(int userId, String state) {
+    UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+    List<BookingEntity> bookings;
 
     switch (state.toUpperCase()) {
       case "ALL":
@@ -113,14 +121,14 @@ public class BookingServiceImpl implements BookingService {
       default:
         throw new UnknownBookingStateException(state);
     }
-    return BookingMapper.toBookingDtos(bookings);
+    return bookingMapper.toModel(bookings);
 
   }
 
   @Override
-  public List<BookingDto> getBookingsOfBooker(int userId, String state) {
-    User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-    List<Booking> bookings;
+  public List<Booking> getBookingsOfBooker(int userId, String state) {
+    UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+    List<BookingEntity> bookings;
 
     LocalDateTime now = LocalDateTime.now();
     switch (state.toUpperCase()) {
@@ -145,7 +153,7 @@ public class BookingServiceImpl implements BookingService {
       default:
         throw new UnknownBookingStateException(state);
     }
-    return BookingMapper.toBookingDtos(bookings);
+    return bookingMapper.toModel(bookings);
   }
 
 }

@@ -1,11 +1,11 @@
 package ru.practicum.shareit.booking.validators;
 
-import ru.practicum.shareit.booking.dto.InputBooking;
+import ru.practicum.shareit.booking.dto.InputBookingRequest;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class StartEndPropertiesValidator implements ConstraintValidator<StartEndProperties, InputBooking> {
+public class StartEndPropertiesValidator implements ConstraintValidator<StartEndProperties, InputBookingRequest> {
 
   @Override
   public void initialize(StartEndProperties constraintAnnotation) {
@@ -13,7 +13,7 @@ public class StartEndPropertiesValidator implements ConstraintValidator<StartEnd
   }
 
   @Override
-  public boolean isValid(InputBooking value, ConstraintValidatorContext constraintValidatorContext) {
+  public boolean isValid(InputBookingRequest value, ConstraintValidatorContext constraintValidatorContext) {
     return value.getStart() != null
             && value.getEnd() != null
             && value.getStart().isBefore(value.getEnd());

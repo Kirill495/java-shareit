@@ -1,11 +1,11 @@
 package ru.practicum.shareit.item.validators;
 
-import ru.practicum.shareit.item.dto.InputUpdatedItemDTO;
+import ru.practicum.shareit.item.dto.item.UpdateItemRequest;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class AtLeastOneNonNullFieldValidator implements ConstraintValidator<AtLeastOneNonNullField, InputUpdatedItemDTO> {
+public class AtLeastOneNonNullFieldValidator implements ConstraintValidator<AtLeastOneNonNullField, UpdateItemRequest> {
 
   @Override
   public void initialize(AtLeastOneNonNullField constraintAnnotation) {
@@ -13,7 +13,7 @@ public class AtLeastOneNonNullFieldValidator implements ConstraintValidator<AtLe
   }
 
   @Override
-  public boolean isValid(InputUpdatedItemDTO value, ConstraintValidatorContext constraintValidatorContext) {
+  public boolean isValid(UpdateItemRequest value, ConstraintValidatorContext constraintValidatorContext) {
     return value.getAvailable() != null
             || value.getDescription() != null
             || value.getName() != null;

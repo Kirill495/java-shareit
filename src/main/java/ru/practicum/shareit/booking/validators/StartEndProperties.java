@@ -16,7 +16,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 public @interface StartEndProperties {
 
-  String message() default "Дата окончания меньше даты старта"; // "{BookingStartEndProperties.invalid}";
+  String message() default "Дата окончания меньше даты старта";
   Class<?>[] groups() default {};
   Class<? extends Payload>[] payload() default {};
 
