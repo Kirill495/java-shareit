@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.item.dto.comment.InputCommentDto;
 import ru.practicum.shareit.item.dto.comment.OutputCommentDto;
+import ru.practicum.shareit.item.dto.item.ItemResponse;
 import ru.practicum.shareit.item.dto.item.NewItemRequest;
 import ru.practicum.shareit.item.dto.item.UpdateItemRequest;
-import ru.practicum.shareit.item.dto.item.ItemResponse;
+import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
 import java.util.List;
