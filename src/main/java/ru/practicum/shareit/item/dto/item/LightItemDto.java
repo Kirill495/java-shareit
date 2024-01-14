@@ -1,13 +1,13 @@
-package ru.practicum.shareit.user.model;
+package ru.practicum.shareit.item.dto.item;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class User {
-
+@Builder(setterPrefix = "with")
+public class LightItemDto {
   private Integer id;
   private String name;
-  private String email;
 }
