@@ -17,13 +17,14 @@ import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -36,8 +37,6 @@ public class UserServiceTest {
 
   @Captor
   private ArgumentCaptor<UserEntity> userEntityArgumentCaptor;
-
-  @Captor ArgumentCaptor<Collection<UserEntity>> userEntityCollectionArgumentCaptor;
 
   @InjectMocks
   private UserServiceImpl userService;
@@ -69,11 +68,10 @@ public class UserServiceTest {
   @Test
   void getAllUsers_whenRepositoryIsEmpty_thenReturnEmptyList() {
     when(userMapper.toModel(Collections.emptyList())).thenReturn(Collections.emptyList());
-//    when(userRepository.findAll()).thenReturn(Collections.emptyList());
+    when(userRepository.findAll()).thenReturn(Collections.emptyList());
 
     userService.getAllUsers();
 
-//    userEntityCollectionArgumentCaptor = verify(userRepository, times(1)).findAll();
   }
 
   @Test

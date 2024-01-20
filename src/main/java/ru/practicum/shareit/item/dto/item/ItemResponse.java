@@ -3,11 +3,13 @@ package ru.practicum.shareit.item.dto.item;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(of = "id")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(setterPrefix = "with")
@@ -29,6 +31,7 @@ public class ItemResponse {
    }
 
    @Data
+   @AllArgsConstructor
    public static class User {
       private Integer id;
    }
