@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.repository;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -77,58 +79,30 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Integer>
           "ORDER BY b.start")
   BookingEntity getNextBooking(ItemEntity item, PageRequest page);
 
-  @Query("SELECT b " +
-          "FROM BookingEntity AS b " +
-          "JOIN FETCH b.item AS i " +
-          "WHERE i.owner = ?1 " +
-          "ORDER BY b.start DESC")
-  List<BookingEntity> getAllByItemOwner(UserEntity user);
+  Page<BookingEntity> findByItemOwner(UserEntity itemOwner, Pageable pageable);
 
-  @Query("SELECT b " +
-          "FROM BookingEntity AS b " +
-          "JOIN FETCH b.item AS i " +
-          "WHERE i.owner = ?1 " +
-          "   AND CURRENT_TIMESTAMP BETWEEN b.start AND b.end " +
-          "ORDER BY b.start DESC")
-  List<BookingEntity> getCurrentByItemOwner(UserEntity user);
+  Page<BookingEntity> findByItemOwnerAndStartBeforeAndEndAfter(
+          UserEntity itemOwner, LocalDateTime now1, LocalDateTime now2, Pageable pageable);
 
-  @Query("SELECT b " +
-          "FROM BookingEntity AS b " +
-          "JOIN FETCH b.item AS i " +
-          "WHERE i.owner = ?1 " +
-          "   AND CURRENT_TIMESTAMP > b.end " +
-          "ORDER BY b.start DESC")
-  List<BookingEntity> getPastByItemOwner(UserEntity user);
+  Page<BookingEntity> findByItemOwnerAndEndBefore(UserEntity itemOwner, LocalDateTime dateTime, Pageable pageable);
 
-  @Query("SELECT b " +
-          "FROM BookingEntity AS b " +
-          "JOIN FETCH b.item AS i " +
-          "WHERE i.owner = ?1 " +
-          "   AND CURRENT_TIMESTAMP < b.start " +
-          "ORDER BY b.start DESC")
-  List<BookingEntity> getFutureByItemOwner(UserEntity user);
+  Page<BookingEntity> findByItemOwnerAndStartAfter(UserEntity user, LocalDateTime dateTime, Pageable pageable);
 
-  @Query("SELECT b " +
-          "FROM BookingEntity AS b " +
-          "JOIN FETCH b.item AS i " +
-          "WHERE i.owner = ?1 " +
-          "   AND b.status = ?2 " +
-          "ORDER BY b.start DESC")
-  List<BookingEntity> getByItemOwnerAndStatus(UserEntity user, BookingStatus status);
+  Page<BookingEntity> findByItemOwnerAndStatus(UserEntity itemOwner, BookingStatus status, Pageable pageable);
 
-  List<BookingEntity> findByBookerOrderByStartDesc(UserEntity booker);
+  Page<BookingEntity> findByBooker(UserEntity booker, Pageable pageable);
 
   // Future
-  List<BookingEntity> findByBookerAndStartAfterOrderByStartDesc(UserEntity booker, LocalDateTime dateTime);
+  Page<BookingEntity> findByBookerAndStartAfter(UserEntity booker, LocalDateTime dateTime, Pageable pageable);
 
   //Past
-  List<BookingEntity> findByBookerAndEndBeforeOrderByStartDesc(UserEntity booker, LocalDateTime dateTime);
+  Page<BookingEntity> findByBookerAndEndBefore(UserEntity booker, LocalDateTime dateTime, Pageable pageable);
 
   // Present
-  List<BookingEntity> findByBookerAndStartBeforeAndEndAfterOrderByEndDescId(UserEntity booker, LocalDateTime currentTime1, LocalDateTime currentTime2);
+  Page<BookingEntity> findByBookerAndStartBeforeAndEndAfter(UserEntity booker, LocalDateTime currentTime1, LocalDateTime currentTime2, Pageable pageable);
 
   // WAITING, REJECTED
-  List<BookingEntity> findByBookerAndStatusOrderByStartDesc(UserEntity booker, BookingStatus status);
+  Page<BookingEntity> findByBookerAndStatus(UserEntity booker, BookingStatus status, Pageable pageable);
 
   List<BookingEntity> findByBookerAndItemAndEndBefore(UserEntity booker, ItemEntity item, LocalDateTime currentTime);
 }

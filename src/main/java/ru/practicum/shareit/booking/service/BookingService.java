@@ -9,9 +9,9 @@ public interface BookingService {
 
   Booking getBooking(int userId, int bookingId);
 
-  List<Booking> getBookingsOfBooker(int userId, String state);
+  List<Booking> getBookingsOfBooker(int userId, String state, Integer from, Integer size);
 
-  List<Booking> getBookingsOfItemOwner(int userId, String state);
+  List<Booking> getBookingsOfItemOwner(int userId, String state, Integer from, Integer size);
 
   Booking updateApprovedStatus(int userId, int bookingId, boolean approved);
 }

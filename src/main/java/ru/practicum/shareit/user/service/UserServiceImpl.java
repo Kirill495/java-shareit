@@ -49,15 +49,10 @@ public class UserServiceImpl implements UserService {
    public User updateUser(int userId, User inputUser) {
       User savedUser = userMapper
               .toModel(userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId)));
-      if (inputUser.getName() != null) {
-         savedUser.setName(inputUser.getName());
-      }
-      if (inputUser.getEmail() != null) {
-         savedUser.setEmail(inputUser.getEmail());
-      }
+      User updatedUser = updateUserModelFields(savedUser, inputUser);
 
       try {
-         return userMapper.toModel(userRepository.save(userMapper.toEntity(savedUser)));
+         return userMapper.toModel(userRepository.save(userMapper.toEntity(updatedUser)));
       } catch (DataIntegrityViolationException exception) {
          if (userRepository.existsByEmail(inputUser.getEmail())) {
             throw new UserDuplicateEmailException(inputUser);
@@ -75,4 +70,13 @@ public class UserServiceImpl implements UserService {
       }
    }
 
+   private User updateUserModelFields(User savedUser, User inputUser) {
+      if (inputUser.getName() != null) {
+         savedUser.setName(inputUser.getName());
+      }
+      if (inputUser.getEmail() != null) {
+         savedUser.setEmail(inputUser.getEmail());
+      }
+      return savedUser;
+   }
 }

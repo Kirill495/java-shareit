@@ -1,7 +1,7 @@
 package ru.practicum.shareit.booking;
 
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +17,10 @@ import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
-@Data
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
@@ -51,14 +52,18 @@ public class BookingController {
 
   @GetMapping(path = "/owner")
   public List<BookingResponse> getBookings(@RequestHeader(value = "X-Sharer-User-Id") int userId,
-                                           @RequestParam(value = "state", defaultValue = "ALL") String state) {
-    return mapper.toResponse(bookingService.getBookingsOfItemOwner(userId, state));
+                                           @RequestParam(value = "state", defaultValue = "ALL") String state,
+                                           @Valid @RequestParam(value = "from", defaultValue = "0") @Min(value = 0L) Integer from,
+                                           @Valid @RequestParam(value = "size", defaultValue = "100") @Min(value = 1L) Integer size) {
+    return mapper.toResponse(bookingService.getBookingsOfItemOwner(userId, state, from, size));
   }
 
-  @GetMapping(path = "")
+  @GetMapping
   public List<BookingResponse> getBookingsByBooker(@RequestHeader(value = "X-Sharer-User-Id") int userId,
-                                                   @RequestParam(value = "state", defaultValue = "ALL") String state) {
-    return mapper.toResponse(bookingService.getBookingsOfBooker(userId, state));
+                                                   @RequestParam(value = "state", defaultValue = "ALL") String state,
+                                                   @Valid @RequestParam(value = "from", defaultValue = "0") @Min(value = 0L) Integer from,
+                                                   @Valid @RequestParam(value = "size", defaultValue = "100") @Min(value = 1L) Integer size) {
+    return mapper.toResponse(bookingService.getBookingsOfBooker(userId, state, from, size));
   }
 
 

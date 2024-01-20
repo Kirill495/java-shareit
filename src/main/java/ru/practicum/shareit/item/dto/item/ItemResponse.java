@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.List;
 
@@ -20,7 +19,7 @@ public class ItemResponse {
    private Boolean available;
    private Booking lastBooking;
    private Booking nextBooking;
-   private ItemRequest request;
+   private Integer requestId;
    private List<Comment> comments;
 
    @Data

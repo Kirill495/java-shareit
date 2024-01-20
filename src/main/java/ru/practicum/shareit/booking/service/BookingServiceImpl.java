@@ -1,6 +1,10 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.entity.BookingEntity;
 import ru.practicum.shareit.booking.exceptions.BookingNotFoundException;
@@ -95,65 +99,66 @@ public class BookingServiceImpl implements BookingService {
   }
 
   @Override
-  public List<Booking> getBookingsOfItemOwner(int userId, String state) {
+  public List<Booking> getBookingsOfItemOwner(int userId, String state, Integer from, Integer size) {
     UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     List<BookingEntity> bookings;
-
-    switch (state.toUpperCase()) {
-      case "ALL":
-        bookings = bookingRepository.getAllByItemOwner(user);
-        break;
-      case "CURRENT":
-        bookings = bookingRepository.getCurrentByItemOwner(user);
-        break;
-      case "PAST":
-        bookings = bookingRepository.getPastByItemOwner(user);
-        break;
-      case "FUTURE":
-        bookings = bookingRepository.getFutureByItemOwner(user);
-        break;
-      case "WAITING":
-        bookings = bookingRepository.getByItemOwnerAndStatus(user, BookingStatus.WAITING);
-        break;
-      case "REJECTED":
-        bookings = bookingRepository.getByItemOwnerAndStatus(user, BookingStatus.REJECTED);
-        break;
-      default:
-        throw new UnknownBookingStateException(state);
-    }
-    return bookingMapper.toModel(bookings);
-
-  }
-
-  @Override
-  public List<Booking> getBookingsOfBooker(int userId, String state) {
-    UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-    List<BookingEntity> bookings;
-
+    Pageable pageable = PageRequest.of(from, size, Sort.by("start").descending());
     LocalDateTime now = LocalDateTime.now();
     switch (state.toUpperCase()) {
       case "ALL":
-        bookings = bookingRepository.findByBookerOrderByStartDesc(user);
+        bookings = bookingRepository.findByItemOwner(user, pageable).getContent();
         break;
       case "CURRENT":
-        bookings = bookingRepository.findByBookerAndStartBeforeAndEndAfterOrderByEndDescId(user, now, now);
+        bookings = bookingRepository.findByItemOwnerAndStartBeforeAndEndAfter(user, now, now, pageable).getContent();
         break;
       case "PAST":
-        bookings = bookingRepository.findByBookerAndEndBeforeOrderByStartDesc(user, now);
+        bookings = bookingRepository.findByItemOwnerAndEndBefore(user, now, pageable).getContent();
         break;
       case "FUTURE":
-        bookings = bookingRepository.findByBookerAndStartAfterOrderByStartDesc(user, now);
+        bookings = bookingRepository.findByItemOwnerAndStartAfter(user, now, pageable).getContent();
         break;
       case "WAITING":
-        bookings = bookingRepository.findByBookerAndStatusOrderByStartDesc(user, BookingStatus.WAITING);
+        bookings = bookingRepository.findByItemOwnerAndStatus(user, BookingStatus.WAITING, pageable).getContent();
         break;
       case "REJECTED":
-        bookings = bookingRepository.findByBookerAndStatusOrderByStartDesc(user, BookingStatus.REJECTED);
+        bookings = bookingRepository.findByItemOwnerAndStatus(user, BookingStatus.REJECTED, pageable).getContent();
         break;
       default:
         throw new UnknownBookingStateException(state);
     }
     return bookingMapper.toModel(bookings);
+  }
+
+  @Override
+  public List<Booking> getBookingsOfBooker(int userId, String state, Integer from, Integer size) {
+    UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+    Page<BookingEntity> bookingsPage;
+    LocalDateTime now = LocalDateTime.now();
+    Pageable page = PageRequest.of(from / size, size, Sort.by("Start").descending());
+    switch (state.toUpperCase()) {
+      case "ALL":
+        bookingsPage = bookingRepository.findByBooker(user, page);
+        break;
+      case "CURRENT":
+        bookingsPage = bookingRepository.findByBookerAndStartBeforeAndEndAfter(user, now, now, page);
+        break;
+      case "PAST":
+        bookingsPage = bookingRepository.findByBookerAndEndBefore(user, now, page);
+        break;
+      case "FUTURE":
+        bookingsPage = bookingRepository.findByBookerAndStartAfter(user, now, page);
+        break;
+      case "WAITING":
+        bookingsPage = bookingRepository.findByBookerAndStatus(user, BookingStatus.WAITING, page);
+        break;
+      case "REJECTED":
+        bookingsPage = bookingRepository.findByBookerAndStatus(user, BookingStatus.REJECTED, page);
+        break;
+      default:
+        throw new UnknownBookingStateException(state);
+    }
+
+    return bookingMapper.toModel(bookingsPage.getContent());
   }
 
 }
