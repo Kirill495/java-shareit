@@ -1,6 +1,8 @@
 package ru.practicum.shareit.user.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -13,6 +15,7 @@ import ru.practicum.shareit.user.dto.NewUserRequest;
 import ru.practicum.shareit.user.dto.OutputUser;
 import ru.practicum.shareit.user.dto.UpdateUserRequest;
 import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
@@ -38,9 +41,11 @@ public class UserController {
    }
 
    @PostMapping
-   public OutputUser createUser(@RequestBody @Valid NewUserRequest request) {
-      return userMapper
-              .toOutputUser(service.createNewUser(userMapper.toModel(request)));
+   public ResponseEntity<OutputUser> createUser(@RequestBody @Valid NewUserRequest request) {
+      User inputUser = userMapper.toModel(request);
+      User newUser = service.createNewUser(inputUser);
+      OutputUser outputUserDto = userMapper.toOutputUser(newUser);
+      return new ResponseEntity<>(outputUserDto, HttpStatus.CREATED);
    }
 
    @PatchMapping("/{userId}")
