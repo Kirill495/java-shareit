@@ -80,11 +80,19 @@ public class ItemRequestServiceImpl implements ItemRequestService {
   @Override
   public Collection<ItemRequestDto> getRequests(int userId, Integer from, Integer size) {
     UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+    if (from != null && from == 0 && size != null && size == 0) {
+      throw new GetRequestsParameterException("Параметры from и size не могут быть оба равны нулю");
+    }
+    if (from == null) {
+      from = 0;
+    }
+    if (size == null) {
+      size = 0;
+    }
     if (size == 0) {
       return Collections.emptyList();
     }
-    PageRequest page = buildPageParameter(from, size).withSort(Sort.by("created").descending());
-
+    PageRequest page = PageRequest.of(from / size, size).withSort(Sort.by("created").descending());
     Collection<ItemRequestEntity> requestEntities = requestRepository.findByAuthorNot(userEntity, page);
 
     return convertToItemRequestDtos(requestEntities);
@@ -109,18 +117,5 @@ public class ItemRequestServiceImpl implements ItemRequestService {
       }
     }
     return requestDtos;
-  }
-
-  private PageRequest buildPageParameter(Integer from, Integer size) {
-    if (from != null && from == 0 && size != null && size == 0) {
-      throw new GetRequestsParameterException("Параметры from и size не могут быть оба равны нулю");
-    }
-    if (from == null) {
-      from = 0;
-    }
-    if (size == null) {
-      size = 0;
-    }
-    return (size == 0) ? PageRequest.of(from, size) : PageRequest.of(from / size, size);
   }
 }

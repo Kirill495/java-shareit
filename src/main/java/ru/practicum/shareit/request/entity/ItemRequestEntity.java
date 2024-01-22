@@ -3,6 +3,7 @@ package ru.practicum.shareit.request.entity;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import ru.practicum.shareit.user.entity.UserEntity;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 @Setter
 @EqualsAndHashCode(of = {"id", "description"})
 @AllArgsConstructor
+@NoArgsConstructor
 public class ItemRequestEntity {
 
   @Id
