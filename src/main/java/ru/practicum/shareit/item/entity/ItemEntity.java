@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.request.entity.ItemRequestEntity;
 import ru.practicum.shareit.user.entity.UserEntity;
@@ -18,6 +19,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Data
+@EqualsAndHashCode(exclude = {"owner", "request"})
 @Builder(setterPrefix = "with")
 @Entity
 @Table(name = "items")
