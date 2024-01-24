@@ -82,7 +82,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Integer>
   Page<BookingEntity> findByItemOwner(UserEntity itemOwner, Pageable pageable);
 
   Page<BookingEntity> findByItemOwnerAndStartBeforeAndEndAfter(
-          UserEntity itemOwner, LocalDateTime now1, LocalDateTime now2, Pageable pageable);
+          UserEntity itemOwner, LocalDateTime dateTime1, LocalDateTime dateTime2, Pageable pageable);
 
   Page<BookingEntity> findByItemOwnerAndEndBefore(UserEntity itemOwner, LocalDateTime dateTime, Pageable pageable);
 

@@ -2,11 +2,13 @@ package ru.practicum.shareit.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.user.dto.NewUserRequest;
 import ru.practicum.shareit.user.dto.OutputUser;
@@ -16,19 +18,13 @@ import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = UserController.class)
+@ActiveProfiles(profiles = {"test"})
 class UserControllerIntegrationTest {
 
   @Autowired
@@ -44,6 +40,7 @@ class UserControllerIntegrationTest {
 
   @SneakyThrows
   @Test
+  @DisplayName("Test should return new user and status OK for GET-request")
   void getUser_whenUserExists_ThenReturnUser() {
 
     int userId = 0;
@@ -63,6 +60,7 @@ class UserControllerIntegrationTest {
   }
 
   @Test
+  @DisplayName("Test should return status NOT_FOUND for GET-request")
   void getUser_whenUserNotExists_ThenReturnStatusNotFound() throws Exception {
 
     int userId = 0;
@@ -74,6 +72,7 @@ class UserControllerIntegrationTest {
   }
 
   @Test
+  @DisplayName("Test should return new User and status CREATED")
   void createUser_whenUserNotExists_ThenReturnNewUser() throws Exception {
     int userId = 0;
     String name = "Vladimir";
@@ -103,6 +102,7 @@ class UserControllerIntegrationTest {
   }
 
   @Test
+  @DisplayName("Test should return BAD_REQUEST for create user request when user name is blank")
   void createUser_whenUserNameIsEmpty_ThenReturnBadRequest() throws Exception {
     String email = "vladimir@email.org";
 
@@ -115,6 +115,7 @@ class UserControllerIntegrationTest {
   }
 
   @Test
+  @DisplayName("Test should return BAD_REQUEST for crate user request when user name is null")
   void createUser_whenUserNameIsNull_ThenReturnBadRequest() throws Exception {
     String email = "vladimir@email.org";
 
@@ -127,6 +128,7 @@ class UserControllerIntegrationTest {
   }
 
   @Test
+  @DisplayName("Test should return BAD_REQUEST for request create user when user email is blank")
   void createUser_whenUserEmailIsEmpty_ThenReturnBadRequest() throws Exception {
     String name = "Vladimir";
 
@@ -139,10 +141,12 @@ class UserControllerIntegrationTest {
   }
 
   @Test
+  @DisplayName("Test should return BAD_REQUEST to request create user when user email is incorrect")
   void createUser_whenUserEmailIsIncorrect_ThenReturnBadRequest() throws Exception {
+    String name  = "Vladimir";
     String email = "vladimir.org";
 
-    NewUserRequest inputUser = new NewUserRequest(null, email);
+    NewUserRequest inputUser = new NewUserRequest(name, email);
     mockMvc.perform(
                     post("/users")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -151,6 +155,7 @@ class UserControllerIntegrationTest {
   }
 
   @Test
+  @DisplayName("Test should return status OK and new updated user to update request with correct input")
   void updateUser_whenUserIsCorrect_ThenReturnNewUser() throws Exception {
 
     int userId = 0;
@@ -177,6 +182,7 @@ class UserControllerIntegrationTest {
   }
 
   @Test
+  @DisplayName("Test should return BAD REQUEST to update request with both blank name and email")
   void updateUser_whenUserWithBlankFields_ThenReturnBadRequest() throws Exception {
     int userId = 0;
 
@@ -190,6 +196,7 @@ class UserControllerIntegrationTest {
   }
 
   @Test
+  @DisplayName("Test should return OK for remove request and user exists")
   void removeUser_whenUserExists_thenReturnOk() throws Exception {
     int userId = 0;
     doNothing().when(userService).removeUser(userId);
@@ -199,6 +206,7 @@ class UserControllerIntegrationTest {
   }
 
   @Test
+  @DisplayName("Test should return NOT_FOUND for remove request when userId is unknown")
   void removeUser_whenUserNotExists_thenReturnNotFound() throws Exception {
     int userId = 0;
     doThrow(new UserNotFoundException(userId)).when(userService).removeUser(userId);

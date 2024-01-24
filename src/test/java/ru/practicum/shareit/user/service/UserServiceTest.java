@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.ActiveProfiles;
 import ru.practicum.shareit.user.entity.UserEntity;
 import ru.practicum.shareit.user.exceptions.CreateNewUserException;
 import ru.practicum.shareit.user.exceptions.UserDuplicateEmailException;
@@ -22,11 +23,10 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles(profiles = {"test"})
 public class UserServiceTest {
 
   @Mock
@@ -101,7 +101,7 @@ public class UserServiceTest {
 
     Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-    UserNotFoundException ex = assertThrows(UserNotFoundException.class, () -> userService.updateUser(userId, Mockito.any()));
+    UserNotFoundException ex = assertThrows(UserNotFoundException.class, () -> userService.updateUser(userId, new User(null, "Herman", "herman@email.org")));
 
     assertEquals("Пользователь с id \"1\" не существует", ex.getMessage());
     Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
