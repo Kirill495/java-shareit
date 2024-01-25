@@ -24,6 +24,10 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.entity.ItemRequestEntity;
+import ru.practicum.shareit.request.exceptions.ItemRequestNotFoundException;
+import ru.practicum.shareit.request.mapper.ItemRequestMapper;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.entity.UserEntity;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -42,6 +46,7 @@ public class ItemServiceImpl implements ItemService {
 
   private final UserRepository userRepository;
   private final ItemRepository itemRepository;
+  private final ItemRequestRepository requestRepository;
   private final BookingRepository bookingRepository;
   private final CommentRepository commentRepository;
 
@@ -49,14 +54,21 @@ public class ItemServiceImpl implements ItemService {
   private final BookingMapper bookingMapper;
   private final UserMapper userMapper;
   private final CommentMapper commentMapper;
+  private final ItemRequestMapper requestMapper;
 
   @Override
-  public ItemResponse createNewItem(int userId, NewItemRequest request) {
-    Item item = itemMapper.toModel(request);
+  public ItemResponse createNewItem(int userId, NewItemRequest newItem) {
+    Item item = itemMapper.toModel(newItem);
     User owner = userMapper
             .toModel(userRepository
                     .findById(userId).orElseThrow(() -> new UserNotFoundException(userId)));
     item.setOwner(owner);
+    Integer requestId = newItem.getRequestId();
+    if (requestId != null) {
+      ItemRequestEntity requestEntity = requestRepository
+              .findById(requestId).orElseThrow(() -> new ItemRequestNotFoundException(requestId));
+      item.setRequest(requestMapper.toModel(requestEntity));
+    }
     ItemEntity savedItem = itemRepository.save(itemMapper.toEntity(item));
 
     return itemMapper.toResponse(itemMapper.toModel(savedItem));

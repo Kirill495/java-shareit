@@ -15,15 +15,21 @@ import ru.practicum.shareit.item.dto.item.NewItemRequest;
 import ru.practicum.shareit.item.dto.item.UpdateItemRequest;
 import ru.practicum.shareit.item.entity.ItemEntity;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.mapper.ItemRequestMapper;
+
+import java.util.Collection;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        builder = @Builder(disableBuilder = true))
+        builder = @Builder(disableBuilder = true),
+        uses = ItemRequestMapper.class)
 public interface ItemMapper {
 
   ItemMapper MAPPER = Mappers.getMapper(ItemMapper.class);
 
   Item toModel(ItemEntity entity);
+
+  Collection<Item> toModel(Collection<ItemEntity> entities);
 
   Item toModel(UpdateItemRequest request);
 
@@ -31,6 +37,7 @@ public interface ItemMapper {
 
   ItemEntity toEntity(Item model);
 
+  @Mapping(source = "request.id", target = "requestId")
   ItemResponse toResponse(Item model);
 
   @BeanMapping(ignoreByDefault = true)

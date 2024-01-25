@@ -3,12 +3,13 @@ package ru.practicum.shareit.item.dto.item;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(of = "id")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(setterPrefix = "with")
@@ -20,7 +21,7 @@ public class ItemResponse {
    private Boolean available;
    private Booking lastBooking;
    private Booking nextBooking;
-   private ItemRequest request;
+   private Integer requestId;
    private List<Comment> comments;
 
    @Data
@@ -30,6 +31,7 @@ public class ItemResponse {
    }
 
    @Data
+   @AllArgsConstructor
    public static class User {
       private Integer id;
    }

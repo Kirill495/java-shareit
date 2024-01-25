@@ -1,12 +1,22 @@
 package ru.practicum.shareit.request.model;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import ru.practicum.shareit.user.model.User;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(of = {"id", "description"})
 public class ItemRequest {
    private Integer id;
    private String description;
-   private LocalDate created;
+   private LocalDateTime created;
+   private User author;
 }

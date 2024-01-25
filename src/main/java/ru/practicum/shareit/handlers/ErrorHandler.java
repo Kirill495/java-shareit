@@ -9,10 +9,12 @@ import ru.practicum.shareit.booking.exceptions.BookingNotFoundException;
 import ru.practicum.shareit.booking.exceptions.BookingSetStatusByOwnerException;
 import ru.practicum.shareit.booking.exceptions.CreateBookingByOwnerException;
 import ru.practicum.shareit.booking.exceptions.CreateBookingForUnavailableItemException;
+import ru.practicum.shareit.booking.exceptions.NoBookingsToItemException;
 import ru.practicum.shareit.booking.exceptions.UnknownBookingStateException;
 import ru.practicum.shareit.booking.exceptions.UserIsNotOwnerOfBookedItem;
-import ru.practicum.shareit.booking.exceptions.NoBookingsToItemException;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
+import ru.practicum.shareit.request.exceptions.GetRequestsParameterException;
+import ru.practicum.shareit.request.exceptions.ItemRequestNotFoundException;
 import ru.practicum.shareit.user.exceptions.CreateNewUserException;
 import ru.practicum.shareit.user.exceptions.UpdateUserException;
 import ru.practicum.shareit.user.exceptions.UserDuplicateEmailException;
@@ -131,6 +133,22 @@ public class ErrorHandler {
       return Map.of("error", exception.getMessage());
    }
 
+   @ExceptionHandler(ItemRequestNotFoundException.class)
+   @ResponseStatus(HttpStatus.NOT_FOUND)
+   public Map<String, String> handleItemRequestNotFoundException(
+           final ItemRequestNotFoundException exception) {
+      log.debug("Получен статус {}", HttpStatus.BAD_REQUEST, exception);
+      return Map.of("error", exception.getMessage());
+   }
+
+   @ExceptionHandler(GetRequestsParameterException.class)
+   @ResponseStatus(HttpStatus.BAD_REQUEST)
+   public Map<String, String> handleGetRequestsParameterException(
+           final GetRequestsParameterException exception) {
+      log.debug("Получен статус {}", HttpStatus.BAD_REQUEST, exception);
+      return Map.of("error", exception.getMessage());
+   }
+
    @ExceptionHandler(RuntimeException.class)
    @ResponseStatus(HttpStatus.BAD_REQUEST)
    public Map<String, String> handleRuntimeException(
@@ -138,4 +156,5 @@ public class ErrorHandler {
       log.debug("Получен статус {}", HttpStatus.BAD_REQUEST, exception);
       return Map.of("error", exception.getMessage());
    }
+
 }

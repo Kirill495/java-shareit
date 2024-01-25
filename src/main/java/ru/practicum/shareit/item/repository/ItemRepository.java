@@ -3,8 +3,10 @@ package ru.practicum.shareit.item.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.item.entity.ItemEntity;
+import ru.practicum.shareit.request.entity.ItemRequestEntity;
 import ru.practicum.shareit.user.entity.UserEntity;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ItemRepository extends JpaRepository<ItemEntity, Integer> {
@@ -18,4 +20,6 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Integer> {
           "WHERE item.available = TRUE " +
           "AND (UPPER(item.name) like %?1% OR UPPER(item.description) like %?1%)")
   List<ItemEntity> searchAvailableItems(String searchTextName);
+
+  Collection<ItemEntity> findByRequestInOrderById(Collection<ItemRequestEntity> requests);
 }
