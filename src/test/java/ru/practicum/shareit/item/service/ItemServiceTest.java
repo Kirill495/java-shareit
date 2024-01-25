@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import ru.practicum.shareit.booking.entity.BookingEntity;
@@ -40,9 +41,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles(profiles = {"test"})
@@ -83,11 +85,11 @@ class ItemServiceTest {
     Item itemModel = Item.builder().withId(itemId).withName("chair").withDescription("wood chair").withOwner(user).build();
     ItemEntity itemEntity = ItemEntity.builder().withId(itemId).withName("chair").withDescription("wood chair").build();
 
-    when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
-    when(userMapper.toModel(userEntity)).thenReturn(user);
-    when(itemRepository.findById(itemId)).thenReturn(Optional.of(itemEntity));
-    when(itemMapper.toModel(itemEntity)).thenReturn(itemModel);
-    when(itemMapper.toResponse(itemModel)).thenReturn(control);
+    Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
+    Mockito.when(userMapper.toModel(userEntity)).thenReturn(user);
+    Mockito.when(itemRepository.findById(itemId)).thenReturn(Optional.of(itemEntity));
+    Mockito.when(itemMapper.toModel(itemEntity)).thenReturn(itemModel);
+    Mockito.when(itemMapper.toResponse(itemModel)).thenReturn(control);
 
     ItemResponse itemResponse = itemService.getItem(userId, itemId);
 
@@ -99,23 +101,23 @@ class ItemServiceTest {
   void getItem_whenUserIsNotFound_thenThrowUserNotFoundException() {
     int userId = 0;
     int itemId = 1;
-    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+    Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
     assertThrows(UserNotFoundException.class, () -> itemService.getItem(userId, itemId));
 
-    verify(userRepository, times(1)).findById(userId);
+    Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
   }
 
   @Test
   void getItem_whenItemIsNotFound_thenThrowItemNotFoundException() {
     int userId = 1;
     int itemId = 0;
-    when(userRepository.findById(userId)).thenReturn(Optional.of(new UserEntity(userId, "Vlad", "vlad@emael.org")));
-    when(itemRepository.findById(itemId)).thenThrow(ItemNotFoundException.class);
+    Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(new UserEntity(userId, "Vlad", "vlad@emael.org")));
+    Mockito.when(itemRepository.findById(itemId)).thenThrow(ItemNotFoundException.class);
     assertThrows(ItemNotFoundException.class, () -> itemService.getItem(userId, itemId));
 
-    verify(userRepository, times(1)).findById(userId);
-    verify(itemRepository, times(1)).findById(itemId);
+    Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
+    Mockito.verify(itemRepository, Mockito.times(1)).findById(itemId);
   }
 
   @Test
@@ -138,24 +140,24 @@ class ItemServiceTest {
     ItemResponse itemResponse = new ItemResponse(itemId, new ItemResponse.User(userId),
             "table", "plastic table", true, null, null, requestId, null);
 
-    when(itemMapper.toModel(itemRequest)).thenReturn(itemModel);
-    when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
-    when(userMapper.toModel(userEntity)).thenReturn(user);
-    when(itemMapper.toEntity(itemModel)).thenReturn(itemEntity);
-    when(requestRepository.findById(requestId)).thenReturn(Optional.of(requestEntity));
-    when(requestMapper.toModel(requestEntity)).thenReturn(request);
-    when(itemRepository.save(itemEntityToSave)).thenReturn(savedItemEntity);
-    when(itemMapper.toModel((savedItemEntity))).thenReturn(savedItemModel);
-    when(itemMapper.toResponse(savedItemModel)).thenReturn(itemResponse);
+    Mockito.when(itemMapper.toModel(itemRequest)).thenReturn(itemModel);
+    Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
+    Mockito.when(userMapper.toModel(userEntity)).thenReturn(user);
+    Mockito.when(itemMapper.toEntity(itemModel)).thenReturn(itemEntity);
+    Mockito.when(requestRepository.findById(requestId)).thenReturn(Optional.of(requestEntity));
+    Mockito.when(requestMapper.toModel(requestEntity)).thenReturn(request);
+    Mockito.when(itemRepository.save(itemEntityToSave)).thenReturn(savedItemEntity);
+    Mockito.when(itemMapper.toModel((savedItemEntity))).thenReturn(savedItemModel);
+    Mockito.when(itemMapper.toResponse(savedItemModel)).thenReturn(itemResponse);
 
     itemService.createNewItem(userId, itemRequest);
 
-    verify(userRepository, times(1)).findById(anyInt());
-    verify(itemMapper, times(1)).toModel(itemRequest);
-    verify(itemMapper, times(1)).toEntity((itemModel));
-    verify(itemRepository, times(1)).save(itemEntity);
-    verify(itemMapper, times(1)).toModel(savedItemEntity);
-    verify(itemMapper, times(1)).toResponse(savedItemModel);
+    Mockito.verify(userRepository, Mockito.times(1)).findById(anyInt());
+    Mockito.verify(itemMapper, Mockito.times(1)).toModel(itemRequest);
+    Mockito.verify(itemMapper, Mockito.times(1)).toEntity((itemModel));
+    Mockito.verify(itemRepository, Mockito.times(1)).save(itemEntity);
+    Mockito.verify(itemMapper, Mockito.times(1)).toModel(savedItemEntity);
+    Mockito.verify(itemMapper, Mockito.times(1)).toResponse(savedItemModel);
   }
 
   @Test
@@ -168,17 +170,17 @@ class ItemServiceTest {
     Item itemModel = new Item(null, user, "table", "plastic table", true, null);
     ItemEntity itemEntity = new ItemEntity(null, userEntity, "table", "plastic table", true, null);
 
-    when(itemMapper.toModel(itemRequest)).thenReturn(itemModel);
-    when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
-    when(userMapper.toModel(userEntity)).thenReturn(user);
-    when(requestRepository.findById(requestId)).thenReturn(Optional.empty());
+    Mockito.when(itemMapper.toModel(itemRequest)).thenReturn(itemModel);
+    Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
+    Mockito.when(userMapper.toModel(userEntity)).thenReturn(user);
+    Mockito.when(requestRepository.findById(requestId)).thenReturn(Optional.empty());
 
     assertThrows(ItemRequestNotFoundException.class, () -> itemService.createNewItem(userId, itemRequest));
 
-    verify(userRepository, times(1)).findById(anyInt());
-    verify(itemMapper, times(1)).toModel(itemRequest);
-    verify(itemMapper, never()).toEntity((itemModel));
-    verify(itemRepository, never()).save(itemEntity);
+    Mockito.verify(userRepository, Mockito.times(1)).findById(anyInt());
+    Mockito.verify(itemMapper, Mockito.times(1)).toModel(itemRequest);
+    Mockito.verify(itemMapper, Mockito.never()).toEntity((itemModel));
+    Mockito.verify(itemRepository, Mockito.never()).save(itemEntity);
   }
 
   @Test
@@ -187,13 +189,13 @@ class ItemServiceTest {
     int requestId = 1;
     NewItemRequest itemRequest = new NewItemRequest("table", "plastic table", true, requestId);
 
-    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+    Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
     assertThrows(UserNotFoundException.class, () -> itemService.createNewItem(userId, itemRequest));
 
-    verify(userRepository, times(1)).findById(anyInt());
-    verify(itemMapper, times(1)).toModel(any(NewItemRequest.class));
-    verify(itemMapper, never()).toEntity(any(Item.class));
+    Mockito.verify(userRepository, Mockito.times(1)).findById(anyInt());
+    Mockito.verify(itemMapper, Mockito.times(1)).toModel(Mockito.any(NewItemRequest.class));
+    Mockito.verify(itemMapper, Mockito.never()).toEntity(Mockito.any(Item.class));
   }
 
   @Test
@@ -205,7 +207,7 @@ class ItemServiceTest {
   @Test
   void searchItems_whenNothingFound_thenReturnEmptyList() {
     String searchString = "1111";
-    when(itemRepository.searchAvailableItems(searchString)).thenReturn(Collections.emptyList());
+    Mockito.when(itemRepository.searchAvailableItems(searchString)).thenReturn(Collections.emptyList());
     List<ItemResponse> items = itemService.searchItems(searchString);
     assertTrue(items.isEmpty());
   }
@@ -216,9 +218,9 @@ class ItemServiceTest {
     ItemEntity itemEntity = new ItemEntity(1, null, searchString, searchString, true, null);
     Item itemModel = new Item(1, null, searchString, searchString, true, null);
     ItemResponse itemResponse = new ItemResponse(1, null, searchString, searchString, true, null, null, null, null);
-    when(itemMapper.toModel(itemEntity)).thenReturn(itemModel);
-    when(itemMapper.toResponse(itemModel)).thenReturn(itemResponse);
-    when(itemRepository.searchAvailableItems(searchString)).thenReturn(List.of(itemEntity));
+    Mockito.when(itemMapper.toModel(itemEntity)).thenReturn(itemModel);
+    Mockito.when(itemMapper.toResponse(itemModel)).thenReturn(itemResponse);
+    Mockito.when(itemRepository.searchAvailableItems(searchString)).thenReturn(List.of(itemEntity));
 
     List<ItemResponse> items = itemService.searchItems(searchString);
     assertEquals(1, items.size());
@@ -253,15 +255,15 @@ class ItemServiceTest {
     CommentEntity commentEntitySaved = new CommentEntity(commentId, "usual fork", itemEntity, userEntity, null);
     Comment commentSaved = new Comment(commentId, "usual fork", item, user, commentAddMoment);
     OutputCommentDto commentDto = new OutputCommentDto(commentId, "usual fork", "German", "");
-    when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
-    when(itemRepository.findById(itemId)).thenReturn(Optional.of(itemEntity));
-    when(bookingRepository.findByBookerAndItemAndEndBefore(eq(userEntity), eq(itemEntity), any(LocalDateTime.class)))
+    Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
+    Mockito.when(itemRepository.findById(itemId)).thenReturn(Optional.of(itemEntity));
+    Mockito.when(bookingRepository.findByBookerAndItemAndEndBefore(Mockito.eq(userEntity), Mockito.eq(itemEntity), Mockito.any(LocalDateTime.class)))
             .thenReturn(bookings);
-    when(commentMapper.toModel(inputCommentDto)).thenReturn(commentWithoutItemAndAuthor);
-    when(commentMapper.toEntity(any(Comment.class))).thenReturn(commentEntityInput);
-    when(commentRepository.save(commentEntityInput)).thenReturn(commentEntitySaved);
-    when(commentMapper.toModel(commentEntitySaved)).thenReturn(commentSaved);
-    when(commentMapper.toDto(commentSaved)).thenReturn(commentDto);
+    Mockito.when(commentMapper.toModel(inputCommentDto)).thenReturn(commentWithoutItemAndAuthor);
+    Mockito.when(commentMapper.toEntity(Mockito.any(Comment.class))).thenReturn(commentEntityInput);
+    Mockito.when(commentRepository.save(commentEntityInput)).thenReturn(commentEntitySaved);
+    Mockito.when(commentMapper.toModel(commentEntitySaved)).thenReturn(commentSaved);
+    Mockito.when(commentMapper.toDto(commentSaved)).thenReturn(commentDto);
 
     OutputCommentDto resultComment = itemService.addComment(inputCommentDto, itemId, userId);
     assertEquals(commentDto, resultComment);

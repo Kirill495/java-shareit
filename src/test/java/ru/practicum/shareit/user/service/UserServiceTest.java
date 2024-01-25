@@ -23,7 +23,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles(profiles = {"test"})
@@ -47,8 +46,8 @@ public class UserServiceTest {
     int userId = 0;
     UserEntity userEntity = new UserEntity(1, "Victor", "victor@email.ru");
     User controlValue = new User(1, "Victor", "victor@email.ru");
-    when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
-    when(userMapper.toModel(userEntity)).thenReturn(controlValue);
+    Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
+    Mockito.when(userMapper.toModel(userEntity)).thenReturn(controlValue);
 
     User user = userService.getUser(userId);
 
@@ -59,7 +58,7 @@ public class UserServiceTest {
   void getUser_whenUserIsNotFound_thenUserNotFoundException() {
     int userId = 0;
     UserEntity userEntity = new UserEntity(1, "Victor", "victor@email.ru");
-    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+    Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
     UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.getUser(userId));
     assertEquals("Пользователь с id \"0\" не существует", exception.getMessage());
@@ -67,8 +66,8 @@ public class UserServiceTest {
 
   @Test
   void getAllUsers_whenRepositoryIsEmpty_thenReturnEmptyList() {
-    when(userMapper.toModel(Collections.emptyList())).thenReturn(Collections.emptyList());
-    when(userRepository.findAll()).thenReturn(Collections.emptyList());
+    Mockito.when(userMapper.toModel(Collections.emptyList())).thenReturn(Collections.emptyList());
+    Mockito.when(userRepository.findAll()).thenReturn(Collections.emptyList());
 
     userService.getAllUsers();
 
@@ -115,14 +114,14 @@ public class UserServiceTest {
     UserEntity oldUserEntity = new UserEntity(userId, "Semen", "semen@email.ru");
     User newUser = new User(null, "Alexey", null);
 
-    when(userRepository.findById(userId)).thenReturn(Optional.of(oldUserEntity));
-    when(userMapper.toModel(oldUserEntity)).thenReturn(oldUser);
-    when(userMapper.toEntity(new User(userId, "Alexey", "semen@email.ru")))
+    Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(oldUserEntity));
+    Mockito.when(userMapper.toModel(oldUserEntity)).thenReturn(oldUser);
+    Mockito.when(userMapper.toEntity(new User(userId, "Alexey", "semen@email.ru")))
             .thenReturn(new UserEntity(userId, "Alexey", "semen@email.ru"));
 
     userService.updateUser(userId, newUser);
 
-    verify(userRepository).save(userEntityArgumentCaptor.capture());
+    Mockito.verify(userRepository).save(userEntityArgumentCaptor.capture());
     UserEntity savedUser = userEntityArgumentCaptor.getValue();
 
     assertEquals(1, savedUser.getId());
@@ -172,12 +171,12 @@ public class UserServiceTest {
   void createNewUser_whenUserEmailValid_thenSaveUser() {
     UserEntity userEntity = new UserEntity(1, "Petr", "petr@email.ru");
     User userModel = new User(1, "Petr", "petr@email.ru");
-    when(userRepository.save(userEntity)).thenReturn(userEntity);
-    when(userMapper.toEntity(userModel)).thenReturn(userEntity);
-    when(userMapper.toModel(userEntity)).thenReturn(userModel);
+    Mockito.when(userRepository.save(userEntity)).thenReturn(userEntity);
+    Mockito.when(userMapper.toEntity(userModel)).thenReturn(userEntity);
+    Mockito.when(userMapper.toModel(userEntity)).thenReturn(userModel);
 
     assertEquals(userModel, userService.createNewUser(userModel));
-    verify(userRepository).save(userEntity);
+    Mockito.verify(userRepository).save(userEntity);
   }
 
   @Test
@@ -185,16 +184,16 @@ public class UserServiceTest {
     UserEntity userEntity = new UserEntity(1, "Petr", "petr@email.ru");
     User userModel = new User(1, "Petr", "petr@email.ru");
 
-    when(userRepository.save(userEntity)).thenThrow(new DataIntegrityViolationException(""));
-    when(userRepository.existsByEmail(userModel.getEmail())).thenReturn(true);
-    when(userMapper.toEntity(userModel)).thenReturn(userEntity);
+    Mockito.when(userRepository.save(userEntity)).thenThrow(new DataIntegrityViolationException(""));
+    Mockito.when(userRepository.existsByEmail(userModel.getEmail())).thenReturn(true);
+    Mockito.when(userMapper.toEntity(userModel)).thenReturn(userEntity);
 
     UserDuplicateEmailException exception = assertThrows(UserDuplicateEmailException.class,
             () -> userService.createNewUser(userModel));
 
     assertEquals("Пользователь с email \"petr@email.ru\" уже существует", exception.getMessage());
-    verify(userRepository).save(userEntity);
-    verify(userRepository).existsByEmail(userModel.getEmail());
+    Mockito.verify(userRepository).save(userEntity);
+    Mockito.verify(userRepository).existsByEmail(userModel.getEmail());
   }
 
   @Test
@@ -202,13 +201,13 @@ public class UserServiceTest {
     UserEntity userEntity = new UserEntity(1, "Petr", "petr@email.ru");
     User userModel = new User(1, "Petr", "petr@email.ru");
 
-    when(userRepository.save(userEntity)).thenThrow(new DataIntegrityViolationException(""));
-    when(userRepository.existsByEmail(userModel.getEmail())).thenReturn(false);
-    when(userMapper.toEntity(userModel)).thenReturn(userEntity);
+    Mockito.when(userRepository.save(userEntity)).thenThrow(new DataIntegrityViolationException(""));
+    Mockito.when(userRepository.existsByEmail(userModel.getEmail())).thenReturn(false);
+    Mockito.when(userMapper.toEntity(userModel)).thenReturn(userEntity);
 
     assertThrows(CreateNewUserException.class, () -> userService.createNewUser(userModel));
 
-    verify(userRepository, times(1)).save(userEntity);
-    verify(userRepository, times(1)).existsByEmail(userModel.getEmail());
+    Mockito.verify(userRepository, Mockito.times(1)).save(userEntity);
+    Mockito.verify(userRepository, Mockito.times(1)).existsByEmail(userModel.getEmail());
   }
 }
