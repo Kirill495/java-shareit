@@ -3,7 +3,9 @@ package ru.practicum.shareit.booking.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import ru.practicum.shareit.booking.validators.StartEndProperties;
 
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
@@ -11,7 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
-// @StartEndProperties
+@StartEndProperties
 public class InputBookingRequest {
 
   @NotNull
@@ -19,11 +21,11 @@ public class InputBookingRequest {
   private Integer itemId;
 
   @NotNull
-//  @FutureOrPresent
+  @FutureOrPresent
   private LocalDateTime start;
 
   @NotNull
-//  @FutureOrPresent
+  @FutureOrPresent
   private LocalDateTime end;
 
 }
