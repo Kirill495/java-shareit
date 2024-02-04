@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.booking.dto.InputBookingRequest;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -30,7 +31,12 @@ public class BookingController {
   @PostMapping
   public ResponseEntity<Object> createNewBooking(@RequestHeader(value = "X-Sharer-User-Id") int userId,
                                           @RequestBody @Valid InputBookingRequest inputBooking) {
-    return bookingClient.bookItem(userId, inputBooking);
+    if (inputBooking.getStart().isBefore(inputBooking.getEnd())
+        || inputBooking.getStart().equals(inputBooking.getEnd())) {
+      return bookingClient.bookItem(userId, inputBooking);
+    } else {
+      throw new ConstraintViolationException("дата начала должна быть меньше даты окончания", null);
+    }
   }
 
   @PatchMapping("/{bookingId}")
