@@ -30,6 +30,6 @@ class UserRepositoryTestIT {
   @Test
   void existsByEmail() {
     boolean result = userRepository.existsByEmail("oleg@email.ru");
-    assertTrue(!result);
+    assertTrue(result);
   }
 }
