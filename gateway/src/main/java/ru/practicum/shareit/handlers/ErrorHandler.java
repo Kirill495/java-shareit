@@ -2,15 +2,21 @@ package ru.practicum.shareit.handlers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.booking.exceptions.CreateNewBookingException;
+import ru.practicum.shareit.booking.validators.ValidationErrorResponse;
+import ru.practicum.shareit.booking.validators.Violation;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -26,6 +32,18 @@ public class ErrorHandler {
          error.put(violation.getPropertyPath().toString(), violation.getMessage());
       }
       return error;
+   }
+
+   @ExceptionHandler(MethodArgumentNotValidException.class)
+   @ResponseStatus(HttpStatus.BAD_REQUEST)
+   @ResponseBody
+   public ValidationErrorResponse handleMethodArgumentNotValidException(
+           MethodArgumentNotValidException e
+   ) {
+      final List<Violation> violations = e.getBindingResult().getFieldErrors().stream()
+              .map(error -> new Violation(error.getField(), error.getDefaultMessage()))
+              .collect(Collectors.toList());
+      return new ValidationErrorResponse(violations);
    }
 
    @ExceptionHandler(IllegalArgumentException.class)
