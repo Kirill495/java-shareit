@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.shareit.booking.exceptions.CreateNewBookingException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -34,5 +35,14 @@ public class ErrorHandler {
       log.debug("Получен статус {}", HttpStatus.BAD_REQUEST, exception);
       return Map.of("error", "Unknown state: UNSUPPORTED_STATUS");
    }
+
+   @ExceptionHandler(CreateNewBookingException.class)
+   @ResponseStatus(HttpStatus.BAD_REQUEST)
+   public Map<String, String> handleCreateNewBookingException(
+           final CreateNewBookingException exception) {
+      log.debug("Получен статус {}", HttpStatus.BAD_REQUEST, exception);
+      return Map.of("error", exception.getMessage());
+   }
+
 
 }
