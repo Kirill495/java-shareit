@@ -19,6 +19,7 @@ import ru.practicum.shareit.booking.exceptions.CreateNewBookingException;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.time.LocalDateTime;
 
 @Validated
 @RestController
@@ -31,7 +32,7 @@ public class BookingController {
   @PostMapping
   public ResponseEntity<Object> createNewBooking(@RequestHeader(value = "X-Sharer-User-Id") int userId,
                                           @RequestBody @Valid InputBookingRequest inputBooking) {
-    if (inputBooking.getEnd().isAfter(inputBooking.getStart())) {
+    if (inputBooking.getStart().isAfter(LocalDateTime.now()) && inputBooking.getEnd().isAfter(inputBooking.getStart())) {
       return bookingClient.bookItem(userId, inputBooking);
     } else {
       throw new CreateNewBookingException("дата начала должна быть меньше даты окончания");
