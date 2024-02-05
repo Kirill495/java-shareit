@@ -16,7 +16,6 @@ import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.booking.dto.InputBookingRequest;
 import ru.practicum.shareit.booking.exceptions.CreateNewBookingException;
 
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
