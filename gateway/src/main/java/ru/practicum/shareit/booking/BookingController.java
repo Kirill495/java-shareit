@@ -32,10 +32,12 @@ public class BookingController {
   @PostMapping
   public ResponseEntity<Object> createNewBooking(@RequestHeader(value = "X-Sharer-User-Id") int userId,
                                           @RequestBody @Valid InputBookingRequest inputBooking) {
-    if (inputBooking.getStart().isAfter(LocalDateTime.now()) && inputBooking.getEnd().isAfter(inputBooking.getStart())) {
-      return bookingClient.bookItem(userId, inputBooking);
-    } else {
+    if (inputBooking.getStart().isBefore(LocalDateTime.now().minusSeconds(1))) {
+      throw new CreateNewBookingException("дата начала бронирования не может быть меньше текущей даты");
+    } else if (inputBooking.getEnd().isAfter(inputBooking.getStart())) {
       throw new CreateNewBookingException("дата начала должна быть меньше даты окончания");
+    } else {
+      return bookingClient.bookItem(userId, inputBooking);
     }
   }
 
