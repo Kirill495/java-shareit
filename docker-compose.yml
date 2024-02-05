@@ -23,8 +23,7 @@ services:
     depends_on:
       - db
     environment:
-      - TZ=Europe/Moscow
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
+#      - TZ=Europe/Moscow
       - DB_HOST=db
       - DB_PORT=5432
       - DB_NAME=shareit
@@ -41,6 +40,6 @@ services:
     depends_on:
       - server
     environment:
-      - TZ=Europe/Moscow
+#      - TZ=Europe/Moscow
       - SHAREIT_SERVER_URL=http://localhost:8090
 
