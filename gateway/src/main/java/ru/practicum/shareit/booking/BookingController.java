@@ -31,7 +31,7 @@ public class BookingController {
   @PostMapping
   public ResponseEntity<Object> createNewBooking(@RequestHeader(value = "X-Sharer-User-Id") int userId,
                                           @RequestBody @Valid InputBookingRequest inputBooking) {
-    if (!inputBooking.getEnd().isAfter(inputBooking.getStart())) {
+    if (inputBooking.getEnd().isAfter(inputBooking.getStart())) {
       return bookingClient.bookItem(userId, inputBooking);
     } else {
       throw new CreateNewBookingException("дата начала должна быть меньше даты окончания");
