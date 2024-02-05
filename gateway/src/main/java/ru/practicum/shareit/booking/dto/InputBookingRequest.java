@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
@@ -12,15 +13,15 @@ import java.time.LocalDateTime;
 //@StartEndProperties
 public class InputBookingRequest {
 
-//  @NotNull
+  @NotNull
 //  @Positive
   private Integer itemId;
 
-//  @NotNull
+  @NotNull
 //  @FutureOrPresent
   private LocalDateTime start;
 
-//  @NotNull
+  @NotNull
 //  @Future
   private LocalDateTime end;
 
