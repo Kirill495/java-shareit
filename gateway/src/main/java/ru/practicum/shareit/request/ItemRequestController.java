@@ -16,6 +16,7 @@ import ru.practicum.shareit.request.dto.InputItemRequestDto;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Validated
@@ -28,7 +29,7 @@ public class ItemRequestController {
   @PostMapping
   public ResponseEntity<Object> addRequest(@RequestHeader(value = "X-Sharer-User-Id") int userId,
                                                   @RequestBody @Valid InputItemRequestDto input) {
-
+    input.setCreated(LocalDateTime.now());
     return requestClient.addRequest(userId, input);
   }
 
