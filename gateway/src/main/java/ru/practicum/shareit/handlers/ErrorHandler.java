@@ -44,5 +44,11 @@ public class ErrorHandler {
       return Map.of("error", exception.getMessage());
    }
 
-
+   @ExceptionHandler(RuntimeException.class)
+   @ResponseStatus(HttpStatus.BAD_REQUEST)
+   public Map<String, String> handleRuntimeException(
+           final RuntimeException exception) {
+      log.debug("Получен статус {}", HttpStatus.BAD_REQUEST, exception);
+      return Map.of("error", exception.getMessage());
+   }
 }
