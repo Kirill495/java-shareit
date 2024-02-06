@@ -28,7 +28,7 @@ services:
       - postgres
     environment:
 #      - TZ=Europe/Moscow
-      - DB_HOST=db
+      - DB_HOST=postgres
       - DB_PORT=5432
       - DB_NAME=shareit
       - POSTGRES_USER=${DB_USER_NAME}
