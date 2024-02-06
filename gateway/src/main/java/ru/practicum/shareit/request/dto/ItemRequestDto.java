@@ -15,7 +15,6 @@ import java.util.Collection;
 public class ItemRequestDto {
   private Integer id;
   private String description;
-//  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-DD'T'HH:mm:ss")
   private LocalDateTime created;
   private Collection<Item> items;
 

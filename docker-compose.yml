@@ -1,7 +1,7 @@
 version: '3.8'
 services:
 
-  db:
+  postgres:
     image: postgres:13.7-alpine
     volumes:
       - /var/lib/postgresql/data/
@@ -21,7 +21,7 @@ services:
       - "8090:8090"
       - "8091:8091"
     depends_on:
-      - db
+      - postgres
     environment:
 #      - TZ=Europe/Moscow
       - DB_HOST=db
@@ -41,5 +41,5 @@ services:
       - server
     environment:
 #      - TZ=Europe/Moscow
-      - SHAREIT_SERVER_URL=http://localhost:8090
+      - SHAREIT_SERVER_URL=http://server:8090
 

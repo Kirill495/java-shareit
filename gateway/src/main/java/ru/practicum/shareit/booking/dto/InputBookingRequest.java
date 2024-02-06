@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import ru.practicum.shareit.booking.validators.StartEndProperties;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
-//@StartEndProperties
+@StartEndProperties
 public class InputBookingRequest {
 
   @NotNull
@@ -24,7 +25,7 @@ public class InputBookingRequest {
   private LocalDateTime start;
 
   @NotNull
-//  @Future
+  @Future
   private LocalDateTime end;
 
 }
