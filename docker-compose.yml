@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+
+  postgres:
+    image: postgres:13.7-alpine
+    volumes:
+      - /var/lib/postgresql/data/
+    env_file:
+        - .env
+    container_name: shareit_db
+    ports:
+      - "6541:5432"
+    environment:
+      - POSTGRES_DB=shareit
+      - POSTGRES_USER=${DB_USER_NAME}
+      - POSTGRES_PASSWORD=${DB_USER_NAME}
+
+  server:
+    build: server/
+    image: shareit_server
+    container_name: shareit_server
+    env_file:
+      - .env
+    ports:
+      - "8090:8090"
+      - "8091:8091"
+    depends_on:
+      - postgres
+    environment:
+#      - TZ=Europe/Moscow
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=shareit
+      - POSTGRES_USER=${DB_USER_NAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+
+  gateway:
+    build: gateway/
+    image: shareit_gateway
+    container_name: shareit_gateway
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      - server
+    environment:
+#      - TZ=Europe/Moscow
+      - SHAREIT_SERVER_URL=http://localhost:8090
+
